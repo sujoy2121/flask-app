@@ -1718,7 +1718,7 @@
             };
 
             try {
-                const res = await fetch("http://127.0.0.1:5000/start_initialize", {
+                const res = await fetch("/start_initialize", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -1880,7 +1880,7 @@
         }
 
         async function loadData() {
-            const res = await fetch("http://127.0.0.1:5000/funding_arbitrage?user_id=" + userId);
+            const res = await fetch("/funding_arbitrage?user_id=" + userId);
             const data = await res.json();
             // const tbody = document.getElementById("body");
 
@@ -2458,7 +2458,7 @@
 
                     console.log("payload :", JSON.stringify(payload));
 
-                    fetch("http://localhost:5000/save_strategy_params", {
+                    fetch("/save_strategy_params", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"
@@ -3257,7 +3257,7 @@
 
         async function updateStrategyStatus() {
             try {
-                const res = await fetch(`http://localhost:5000/get_user_full_status?user_id=${userId}`);
+                const res = await fetch(`/get_user_full_status?user_id=${userId}`);
                 const resp = await res.json();
 
                 if (!resp.success) {
@@ -3406,7 +3406,7 @@
             if (!confirm(`Are you sure you want to remove leg ${Sname}?`)) return;
 
             try {
-                const res = await fetch("http://localhost:5000/remove_leg", {
+                const res = await fetch("/remove_leg", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ user_id: userId, id: id, name: Sname })
@@ -3424,7 +3424,7 @@
         // Control start/stop strategy
         async function controlStrategy(action) {
             try {
-                const res = await fetch("http://localhost:5000/control", {
+                const res = await fetch("/control", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ user_id: userId, action })
@@ -3624,7 +3624,6 @@
 
     <script>
         token = "3d2a1b4e1bc806605237d663b4e76a0e";
-        APP_URL = "http://127.0.0.1:5000"
 
 
         function formatPrice(num) {
@@ -3782,7 +3781,7 @@
 
                 const symbolsParam = JSON.stringify(cleanTickers);
                 const url =
-                    APP_URL +
+                    // APP_URL +
                     `/tickers?tickers_dcx=true&symbols=${encodeURIComponent(symbolsParam)}`;
 
                 const res = await fetch(url);
@@ -3808,7 +3807,7 @@
 
         async function get_active_order() {
             try {
-                const res = await fetch(APP_URL + "/v2/positions/margined?orders=true&token=" + token);
+                const res = await fetch("/v2/positions/margined?orders=true&token=" + token);
                 if (!res.ok) throw new Error("Unauthorized or fetch error");
                 const data = await res.json();
 
@@ -3971,7 +3970,7 @@
 
         async function get_positions() {
             try {
-                const res = await fetch(APP_URL + "/v2/positions/margined?positions=true&user_id=" + userId + "&token=" + token);
+                const res = await fetch("/v2/positions/margined?positions=true&user_id=" + userId + "&token=" + token);
                 if (!res.ok) throw new Error("Unauthorized or fetch error");
                 const data = await res.json();
                 // console.log("Positions", data.positions);
@@ -4085,7 +4084,7 @@
             const apiKeyText2 = document.getElementById('apiKeyText2');
             const apiSecretText2 = document.getElementById('apiSecretText2');
             try {
-                const res = await fetch(`http://127.0.0.1:5000/get_user/${userId}`);
+                const res = await fetch(`/get_user/${userId}`);
                 if (!res.ok) {
                     console.warn("⚠️ Failed to fetch user data:", res.status);
                     return;
@@ -4124,7 +4123,7 @@
 
         async function updateData() {
             try {
-                const res = await fetch(APP_URL + "/data?token=" + token);
+                const res = await fetch("/data?token=" + token);
                 if (!res.ok) throw new Error("Unauthorized or fetch error");
                 const data = await res.json();
                 document.getElementById("counter").textContent = data.counter;
@@ -4162,7 +4161,7 @@
                 // console.log("symbolsParam :", symbolsParam)
 
                 const url =
-                    APP_URL +
+                    // APP_URL +
                     `/tickers?binance_funding=true&symbols=${encodeURIComponent(symbolsParam)}`;
 
                 const res = await fetch(url);
@@ -4183,11 +4182,11 @@
 
         async function get_futures() {
             try {
-                const dcx_res = await fetch(APP_URL + "/funding?token=" + token + "&funding_Dcx=true");
+                const dcx_res = await fetch("/funding?token=" + token + "&funding_Dcx=true");
                 if (!dcx_res.ok) throw new Error("DCX fetch error");
                 funding_data_dcx = await dcx_res.json();
 
-                const delta_res = await fetch(APP_URL + "/funding?token=" + token + "&funding=true");
+                const delta_res = await fetch("/funding?token=" + token + "&funding=true");
                 if (!delta_res.ok) throw new Error("Delta fetch error");
                 funding_data = await delta_res.json();
 
@@ -5126,7 +5125,7 @@
 
         async function get_balance() {
             try {
-                const res = await fetch(APP_URL + "/v2/wallet/balances?token=" + token);
+                const res = await fetch("/v2/wallet/balances?token=" + token);
                 if (!res.ok) throw new Error("Unauthorized or fetch error");
                 const data = await res.json();
 
@@ -5152,7 +5151,7 @@
 
         async function get_balance_dcx() {
             try {
-                const res = await fetch(APP_URL + "/v2/wallet/balances?token=" + token + "&DCX=true");
+                const res = await fetch("/v2/wallet/balances?token=" + token + "&DCX=true");
                 if (!res.ok) throw new Error("Unauthorized or fetch error");
                 const data = await res.json();
                 // console.log("DCX", data);
@@ -5451,7 +5450,7 @@
                         // তুমি এখানে popup update বা data check করতে পারো
 
                         try {
-                            const res = await fetch(APP_URL + "/v2/positions/margined?positions=true&token=" + token + "&user_id=" + userId);
+                            const res = await fetch("/v2/positions/margined?positions=true&token=" + token + "&user_id=" + userId);
                             if (!res.ok) throw new Error("Unauthorized or fetch error");
                             const data = await res.json();
 
@@ -5588,7 +5587,7 @@
             };
 
             try {
-                const res = await fetch("http://localhost:5000/save_api_delta", {
+                const res = await fetch("/save_api_delta", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(payload)
@@ -5661,7 +5660,7 @@
             };
 
             try {
-                const res = await fetch("http://localhost:5000/save_api_dcx", {
+                const res = await fetch("/save_api_dcx", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(payload)
