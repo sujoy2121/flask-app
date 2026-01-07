@@ -84,8 +84,8 @@ if not firebase_admin._apps:
 # ]
 
 # Thread-safe store
-# data_store = defaultdict(lambda: {"positions": {}, "orders": {}, "margins": {}})
-data_store = {}
+data_store = defaultdict(lambda: {"positions": {}, "orders": {}, "margins": {}})
+# data_store = {}
 
 
 # data_store = defaultdict(lambda: {
@@ -1565,12 +1565,18 @@ class MultiUserManager:
 
                     self.users[user_id] = user
 
+                    # with data_lock:
+                    #     data_store[user_id] = {
+                    #         "positions": {},
+                    #         "orders": {},
+                    #         "margins": {}
+                    #     }
                     with data_lock:
-                        data_store[user_id] = {
-                            "positions": {},
-                            "orders": {},
-                            "margins": {}
-                        }
+                        store = data_store[user_id]   # defaultdict auto-create
+                        store["positions"].clear()
+                        store["orders"].clear()
+                        store["margins"].clear()
+    
 
                     # self.clients[user_id] = {}
                     self.clients[user_id] = {
@@ -2101,13 +2107,18 @@ class MultiUserManager:
 
             self.users[user_id] = user
 
-            with data_lock:
-                data_store[user_id] = {
-                    "positions": {},
-                    "orders": {},
-                    "margins": {}
-                }
+            # with data_lock:
+            #     data_store[user_id] = {
+            #         "positions": {},
+            #         "orders": {},
+            #         "margins": {}
+            #     }
 
+            with data_lock:
+                store = data_store[user_id]
+                store["positions"].clear()
+                store["orders"].clear()
+                store["margins"].clear()
 
                 # ---- DELTA ----
             ws_url = self.get_ws_url_from_firebase(user_id)
@@ -3372,10 +3383,18 @@ class MultiUserManager:
 
 
     def requast_api_data(self, user_id, path, query="", body="", method="GET"):
+        user_id = str(user_id)
 
         print(f"[{user_id}] 🌐 API Request → {method} {path}")
 
-        client = self.clients[user_id]["delta"]
+        # client = self.clients[user_id]["delta"]
+
+        client_map = self.clients.get(user_id)
+        if not client_map or not client_map.get("delta"):
+            return {"success": False, "error": "user_not_initialized"}
+        
+        client = client_map["delta"]
+
         api_key = client.api_key
         api_secret = client.api_secret
         BASE_URL = self.get_rest_url_from_firebase(user_id)   # LIVE
@@ -3430,6 +3449,8 @@ class MultiUserManager:
 
     def get_api_datakk(self,user_id,path, query=None, body=None, method="GET"):
 
+        user_id = str(user_id)
+
         if user_id not in self.clients or not self.clients[user_id].get("delta"):
             return None
 
@@ -3437,6 +3458,7 @@ class MultiUserManager:
         print(f"[{user_id}] 🌐 API Request → {method} {path}")
 
         client = self.clients[user_id]["delta"]
+
         api_key = client.api_key
         api_secret = client.api_secret
 

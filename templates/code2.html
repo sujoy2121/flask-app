@@ -5188,6 +5188,11 @@
             console.log("✅ Starting all intervals...");
             isRunning = true;
 
+            if (!userId) {
+                console.warn("❌ userId missing");
+                return;
+            }
+
             if (userId) {
                 // intervals.push(setInterval(updateApiData, 5000));
                 // intervals.push(setInterval(updateData, 1000));

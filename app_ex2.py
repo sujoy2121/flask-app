@@ -2701,12 +2701,18 @@ a {{ color:#58a6ff; }}
 
 
 
+
+
+
 # catch-all route
 # @app.route('/', defaults={'path': ''})
 # @app.route("/<path:path>")
 @app.route('/', defaults={'path': ''}, methods=["GET", "POST"])
 @app.route("/<path:path>", methods=["GET", "POST"])
 def catch_all(path,user_id="1"):
+
+    user_id = str(user_id)   # ✅ এখানেই
+    # ensure_user_initialized(user_id)
 
     FRONTEND_ROUTES = ["user", "status", "login", "register"]
 
@@ -2783,9 +2789,28 @@ def catch_all(path,user_id="1"):
 
 
         # 🔴 যদি WS data না থাকে → REST দিয়ে আনো
-        if not data_store[user_id]["positions"]:
-            # print(f"[{user_id}] ⚠ No WS positions")
+        # if not data_store[user_id]["positions"]:
+        #     # print(f"[{user_id}] ⚠ No WS positions")
 
+        #     return jsonify({
+        #         "user_id": user_id,
+        #         "positions": {},
+        #         "orders": {},
+        #         "margins": {},
+        #         "message": "positions not ready yet"
+        #     }), 200
+
+
+        if user_id not in data_store:
+            return jsonify({
+                "user_id": user_id,
+                "positions": {},
+                "orders": {},
+                "margins": {},
+                "message": "user not initialized yet"
+            }), 200
+
+        if not data_store[user_id].get("positions"):
             return jsonify({
                 "user_id": user_id,
                 "positions": {},
@@ -2793,6 +2818,7 @@ def catch_all(path,user_id="1"):
                 "margins": {},
                 "message": "positions not ready yet"
             }), 200
+
 
         
 
