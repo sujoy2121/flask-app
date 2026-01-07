@@ -1208,10 +1208,6 @@ def ts():
 class MultiUserManager:
     def __init__(self):
 
-        self._load_initial_users()
-
-
-
         # self.users = []     # user_id → api info
         # self.users = {}   # GOOD: user_id -> user info
         # ✅ FINAL
@@ -1226,6 +1222,8 @@ class MultiUserManager:
 
         self._refresh_lock = Semaphore()
 
+
+        self._load_initial_users()
 
         
          # ✅ START PUBLIC WS HERE (ONE TIME)
