@@ -3405,26 +3405,26 @@ class MultiUserManager:
         print(f"[{user_id}] 🌐 API Request → {method} {path}")
         print("clients keys:", list(self.clients.keys()))
 
-        client_map = self.clients.get(user_id)
+        # client_map = self.clients.get(user_id)
 
-        if not client_map:
-            return {
-                "success": False,
-                "error": "user_not_initialized",
-                "reason": "client_map_missing"
-            }
+        # if not client_map:
+        #     return {
+        #         "success": False,
+        #         "error": "user_not_initialized",
+        #         "reason": "client_map_missing"
+        #     }
 
-        if not client_map.get("delta"):
-            return {
-                "success": False,
-                "error": "user_not_initialized",
-                "reason": "delta_client_missing"
-            }
+        # if not client_map.get("delta"):
+        #     return {
+        #         "success": False,
+        #         "error": "user_not_initialized",
+        #         "reason": "delta_client_missing"
+        #     }
 
-        client = client_map["delta"]
+        # client = client_map["delta"]
         # 👉 এখান থেকে safe
         
-        # client = self.clients[user_id]["delta"]
+        client = self.clients[user_id]["delta"]
         # client = self.clients.get(user_id, {}).get("delta")
 
         
