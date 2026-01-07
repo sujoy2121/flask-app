@@ -3387,11 +3387,11 @@ class MultiUserManager:
 
         print(f"[{user_id}] 🌐 API Request → {method} {path}")
 
-        client = self.clients[user_id]["delta"]
+        
 
         print("user  id problem :",self.clients[user_id]["delta"],"\n",self.clients.get(user_id, {}).get("delta"))
 
-        
+        client = self.clients[user_id]["delta"]
 
         # client_map = self.clients.get(user_id)
         # if not client_map or not client_map.get("delta"):
