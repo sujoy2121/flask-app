@@ -3388,8 +3388,10 @@ class MultiUserManager:
         print(f"[{user_id}] 🌐 API Request → {method} {path}")
 
         
-
+        print("clint :",self.clients)
         print("user  id problem :",self.clients.get(user_id))
+        print("clint :",self.clients[user_id])
+
 
         # client = self.clients[user_id]["delta"]
         # client = self.clients.get(user_id, {}).get("delta")
@@ -3400,7 +3402,9 @@ class MultiUserManager:
         
         client = client_map["delta"]
 
+        print("clint 1:",client)
 
+        print("api key 1:",client.api_key)
 
         api_key = client.api_key
         api_secret = client.api_secret
