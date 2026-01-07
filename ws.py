@@ -1207,6 +1207,11 @@ def ts():
 # ==========================
 class MultiUserManager:
     def __init__(self):
+
+        self._load_initial_users()
+
+
+
         # self.users = []     # user_id → api info
         # self.users = {}   # GOOD: user_id -> user info
         # ✅ FINAL
@@ -1244,7 +1249,7 @@ class MultiUserManager:
         # self.public_ws_testnet.start()
 
 
-        self._load_initial_users()
+        # self._load_initial_users()
         # self._setup_firebase_listener()
         # self._setup_signal_handlers()
 
@@ -1584,7 +1589,7 @@ class MultiUserManager:
                         "dcx": None
                     }
 
-
+                    
 
                     ws_url = self.get_ws_url_from_firebase(user_id)
                     self.clients[user_id]["delta"] = UserWSClient(
@@ -1594,6 +1599,8 @@ class MultiUserManager:
                         ws_url=ws_url,
                         manager=self
                     )
+
+                    print("data =",self.clients[user_id]["delta"])
 
                     # ======================
                     # 🟢 DCX CONFIG (OPTIONAL)
@@ -3391,8 +3398,7 @@ class MultiUserManager:
         print("clint :",self.clients)
         print("user  id problem :",self.clients.get(user_id))
         print("clint :",self.clients[user_id])
-
-
+        
         # client = self.clients[user_id]["delta"]
         # client = self.clients.get(user_id, {}).get("delta")
 
