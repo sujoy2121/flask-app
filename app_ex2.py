@@ -2308,14 +2308,16 @@ monitor_data = {
 # print("Your access token:", SECRET_TOKEN)
 
 
-TOKEN_FILE = "token.txt"
-if os.path.exists(TOKEN_FILE):
-    with open(TOKEN_FILE, "r") as f:
-        SECRET_TOKEN = f.read().strip()
-else:
-    SECRET_TOKEN = secrets.token_hex(16)
-    with open(TOKEN_FILE, "w") as f:
-        f.write(SECRET_TOKEN)
+# TOKEN_FILE = "token.txt"
+# if os.path.exists(TOKEN_FILE):
+#     with open(TOKEN_FILE, "r") as f:
+#         SECRET_TOKEN = f.read().strip()
+# else:
+#     SECRET_TOKEN = secrets.token_hex(16)
+#     with open(TOKEN_FILE, "w") as f:
+#         f.write(SECRET_TOKEN)
+# SECRET_TOKEN = os.getenv("APP_TOKEN")
+SECRET_TOKEN =  "3d2a1b4e1bc806605237d663b4e76a0e"
 
 print("Your access token:", SECRET_TOKEN)
 

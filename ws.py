@@ -63,11 +63,12 @@ logging.basicConfig(
 
 
 # Firebase config
-cred = credentials.Certificate(
-    "air-share-be6be-firebase-adminsdk-pxekd-d21c09d722.json")  # তোমার key ফাইলের নাম
-firebase_admin.initialize_app(cred, {
-    'databaseURL': 'https://air-share-be6be-default-rtdb.firebaseio.com/'  # তোমার ডেটাবেস URL
-})
+if not firebase_admin._apps:
+    cred = credentials.Certificate(
+        "air-share-be6be-firebase-adminsdk-pxekd-d21c09d722.json")  # তোমার key ফাইলের নাম
+    firebase_admin.initialize_app(cred, {
+        'databaseURL': 'https://air-share-be6be-default-rtdb.firebaseio.com/'  # তোমার ডেটাবেস URL
+    })
 
 # Example: Database reference
 # strategies_ref = db.reference("strategies")
