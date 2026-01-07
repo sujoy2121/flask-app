@@ -1526,6 +1526,7 @@ class MultiUserManager:
 
         with users_lock:
             strategies_data = self.db_ref.get()
+            print("🔥 Firebase raw strategies_data =", strategies_data)
             self.users.clear()
             self.clients.clear()
 
