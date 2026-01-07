@@ -2054,6 +2054,7 @@ class MultiUserManager:
     #             c.start()
 
     def start_all(self):
+        self._load_initial_users()   # 🔥 ADD THIS
         with users_lock:
             for client_map in self.clients.values():
                 delta = client_map.get("delta")
