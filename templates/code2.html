@@ -5130,7 +5130,7 @@
                 if (!res.ok) throw new Error("Unauthorized or fetch error");
                 const data = await res.json();
 
-                print("data :", data)
+                console.log("data :", data)
 
                 // 🔍 Find USD & INR
                 const usd = data.find(a => a.asset_symbol === "USD");
