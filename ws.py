@@ -3389,6 +3389,8 @@ class MultiUserManager:
 
         client = self.clients[user_id]["delta"]
 
+        print("user  id problem :",self.clients[user_id]["delta"],"\n",self.clients.get(user_id, {}).get("delta"))
+
         
 
         # client_map = self.clients.get(user_id)
