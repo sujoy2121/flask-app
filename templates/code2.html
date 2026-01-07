@@ -3721,7 +3721,7 @@
                 let data = "";
 
                 const symbolsParam = JSON.stringify(tickers);
-                const url = APP_URL + `/tickers?tickers=true&symbols=${encodeURIComponent(symbolsParam)}`;
+                const url = `/tickers?tickers=true&symbols=${encodeURIComponent(symbolsParam)}`;
 
                 const res = await fetch(url);
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -3781,7 +3781,6 @@
 
                 const symbolsParam = JSON.stringify(cleanTickers);
                 const url =
-                    // APP_URL +
                     `/tickers?tickers_dcx=true&symbols=${encodeURIComponent(symbolsParam)}`;
 
                 const res = await fetch(url);
@@ -4161,7 +4160,6 @@
                 // console.log("symbolsParam :", symbolsParam)
 
                 const url =
-                    // APP_URL +
                     `/tickers?binance_funding=true&symbols=${encodeURIComponent(symbolsParam)}`;
 
                 const res = await fetch(url);
