@@ -1532,6 +1532,7 @@ class MultiUserManager:
 
             if not strategies_data:
                 logging.info("[ম্যানেজার] Firebase empty")
+                print(" Firebase empty")
                 return
 
             try:
@@ -1541,6 +1542,7 @@ class MultiUserManager:
                     iterator = ((str(i), v) for i, v in enumerate(strategies_data))
                 else:
                     logging.error(f"[ম্যানেজার] Invalid Firebase data type")
+                    print("Invalid Firebase data type")
                     return
 
                 for user_id, data in iterator:
@@ -1622,6 +1624,7 @@ class MultiUserManager:
 
             except Exception as e:
                 logging.error(f"[ম্যানেজার] Load error: {e}")
+                print(f" Load error: {e}")
 
 
 
@@ -3092,6 +3095,8 @@ class MultiUserManager:
         data = self.db_ref.child(str(user_id)).get()
         delta = data.get("database", {}).get("delta", {})
         api_type = delta.get("type", "TESTNET")
+
+        print("api type :",api_type)
 
         if api_type == "LIVE":
             return "wss://socket.india.delta.exchange"
