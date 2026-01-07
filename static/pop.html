@@ -1,0 +1,580 @@
+<div class="popup" style="background-color: #1c1c1c; width: 360px; border-radius: 10px; padding: 20px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.6); cursor: pointer;
+    user-select: none; position: absolute;transform: translate(-50%, -50%);">
+
+    <div class="header" style="display: flex; justify-content: space-between; align-items: center;  cursor: grab;">
+        <h3 style="color: #00ff8c; margin: 0; font-size: 16px;" id="head_tittle">Close Long SHIBUSD</h3>
+        <span style="cursor: pointer; color: #aaa;"
+            onclick="window.opener ? window.opener.closeModal() : window.closeModal()">❌</span>
+    </div>
+
+    <div class="tabs"
+        style="display: flex; margin-top: 15px; border: 1px solid #333; border-radius: 8px; overflow: hidden;">
+        <div id="marketTab"
+            style="flex: 1; padding: 10px; text-align: center; cursor: pointer; background-color: #3e3e3e; color: white; font-weight: bold; border-right: 1px solid #333;">
+            Market</div>
+        <div id="limitTab"
+            style="flex: 1; padding: 10px; text-align: center; cursor: pointer; background-color: #1c1c1c; color: #bbb; font-weight: bold;">
+            Limit</div>
+    </div>
+
+    <div class="content" style="margin-top: 15px;">
+
+        <div class="row" style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px;">
+            <div class="label" style="color: #aaa;">Entry Price</div>
+            <div class="value" style="color: white;">0.00001048</div>
+        </div>
+
+        <div class="row" style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px;">
+            <div class="label" style="color: #aaa;">Mark Price</div>
+            <div class="value" style="color: white;">0.00001045</div>
+        </div>
+
+        <div class="row" style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px;">
+            <div class="label" style="color: #aaa;">Breakeven Price <span style="color:#aaa;">↺</span></div>
+            <div class="value" style="color:#ff4d4d;">❌ 0.00001063</div>
+        </div>
+
+        <div id="priceSection" style="display: none; margin-top: 10px;">
+            <div class="label" style="color: #aaa;">Price</div>
+            <div style="display: flex; gap: 5px; margin-top: 5px;">
+                <button class="markbtn"
+                    style="flex: none; width: 60px; background-color: #3e3e3e; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                    Mark</button>
+                <button class="bestbidbtn"
+                    style="flex: none; width: 80px; background-color: #3e3e3e; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                    Best Bid</button>
+                <input type="text" id="priceInput" value="" required
+                    style="flex-grow: 1; margin-top: 0; padding-left: 5px; background-color: #111; border: 1px solid #333; color: white; border-radius: 6px; padding: 8px;">
+            </div>
+        </div>
+
+        <div class="label" style="color: #aaa; margin-top:10px;">Quantity</div>
+        <input type="number" id="qtyInput" value="1"
+            style="background-color: #111; border: 1px solid #333; width: calc(100% - 18px); color: white; border-radius: 6px; padding: 8px; margin-top: 6px;">
+
+        <div id="percentBtns" style="display: flex; justify-content: space-between; margin-top: 10px; gap: 5px;">
+            <div class="percent-btn" data-percent="0.10"
+                style="flex-grow: 1; text-align: center; padding: 6px 0; border-radius: 5px; background-color: #2e2e2e; color: #bbb; font-size: 12px; cursor: pointer; border: 1px solid #2e2e2e;">
+                10%</div>
+            <div class="percent-btn" data-percent="0.25"
+                style="flex-grow: 1; text-align: center; padding: 6px 0; border-radius: 5px; background-color: #2e2e2e; color: #bbb; font-size: 12px; cursor: pointer; border: 1px solid #2e2e2e;">
+                25%</div>
+            <div class="percent-btn" data-percent="0.50"
+                style="flex-grow: 1; text-align: center; padding: 6px 0; border-radius: 5px; background-color: #2e2e2e; color: #bbb; font-size: 12px; cursor: pointer; border: 1px solid #2e2e2e;">
+                50%</div>
+            <div class="percent-btn" data-percent="0.75"
+                style="flex-grow: 1; text-align: center; padding: 6px 0; border-radius: 5px; background-color: #2e2e2e; color: #bbb; font-size: 12px; cursor: pointer; border: 1px solid #2e2e2e;">
+                75%</div>
+            <div class="percent-btn active-percent" data-percent="1.00"
+                style="flex-grow: 1; text-align: center; padding: 6px 0; border-radius: 5px; background-color: #8b5cf6; color: white; font-size: 12px; font-weight: bold; cursor: pointer; border: 1px solid #8b5cf6;">
+                100%</div>
+        </div>
+
+        <div class="qty_alert" style="color:red;text-align: right; display: none;">Quantity greater than available value
+        </div>
+
+        <div class="checkbox" style="margin-top: 10px; display: flex; align-items: center; gap: 15px; font-size: 13px;">
+            <input type="checkbox" id="reduceOnly" checked style="pointer-events: none;">
+            <label for="reduceOnly" style="color:white">Reduce-Only</label>
+            <input type="checkbox" id="ioc" style="display:none;">
+            <label for="ioc" id="iocLabel" style="display:none; color:white">IOC</label>
+        </div>
+
+        <div class="expected-profit"
+            style="text-align: left; margin-top: 15px; font-size: 14px; display: flex; justify-content: space-between; align-items: center;">
+            <div class="label" style="color: #aaa;">Expected Profit</div>
+            <div class="profit-value" id="profitText" style="color: #00ff8c; font-weight: bold;">0.00 USD</div>
+        </div>
+
+        <button class="confirm-btn"
+            style="width: 100%; margin-top: 20px; background-color: #8b5cf6; border: none; color: white; padding: 12px; font-size: 15px; border-radius: 6px; cursor: pointer;">
+            Confirm
+        </button>
+    </div>
+</div>
+
+
+<script>
+    function calculateTradeMetrics(data) {
+        // Extract data
+        const entryPrice = parseFloat(data.entry_price);
+        const markPrice = parseFloat(data.mark_price);
+        const size = parseFloat(data.size); // -1 for short
+        const contractValue = parseFloat(data.product.contract_value); // 100,000
+        const takerCommissionRate = parseFloat(data.product.taker_commission_rate); // 0.0005
+        const makerCommissionRate = parseFloat(data.product.maker_commission_rate); // 0.0002
+        const realizedPnL = parseFloat(data.realized_pnl); // 0
+        const realizedFunding = parseFloat(data.realized_funding); // 0
+
+        // Calculate Notional Value
+        const notionalValue = Math.abs(entryPrice * contractValue * size);
+
+        // Calculate Commission (assuming taker rate for both open and close)
+        const openCommission = notionalValue * takerCommissionRate;
+        const closeCommission = notionalValue * takerCommissionRate;
+        const totalFees = openCommission + closeCommission;
+
+        // Calculate Breakeven Price (for short position)
+        const breakevenPrice = entryPrice - (totalFees / Math.abs(contractValue * size));
+        const roundedBreakevenPrice = Number(breakevenPrice.toFixed(8)); // Round to 8 decimal places
+
+        // Calculate Expected Profit
+        const priceDifference = entryPrice - markPrice;
+        const baseProfit = priceDifference * contractValue * Math.abs(size);
+        const expectedProfit = baseProfit - totalFees;
+        const roundedExpectedProfit = Number(expectedProfit.toFixed(2)); // Round to 2 decimal places
+
+        // Return results
+        return {
+            breakevenPrice: roundedBreakevenPrice,
+            expectedProfit: roundedExpectedProfit
+        };
+    }
+    (function () {
+
+        const popup = document.querySelector(".popup");
+        if (!popup) return;
+
+
+        let markBtn_checked = false;
+        let bestBidBtn_checked = false;
+
+        let order_type = "market_order";
+
+        const header = popup.querySelector('.header');
+
+        let isDragging = false;
+        let offsetX = 0;
+        let offsetY = 0;
+
+        header.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            offsetX = e.clientX - popup.offsetLeft;
+            offsetY = e.clientY - popup.offsetTop;
+            popup.style.cursor = 'pointer';
+            // grabbing
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                popup.style.left = (e.clientX - offsetX) + 'px';
+                popup.style.top = (e.clientY - offsetY) + 'px';
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+            popup.style.cursor = 'pointer';
+        });
+
+        const marketTab = popup.querySelector("#marketTab");
+        const limitTab = popup.querySelector("#limitTab");
+        const priceSection = popup.querySelector("#priceSection");
+        const iocCheckbox = popup.querySelector("#ioc");
+        const iocLabel = popup.querySelector("#iocLabel");
+        const qtyInput = popup.querySelector("#qtyInput");
+        const percentBtns = popup.querySelectorAll("#percentBtns .percent-btn");
+        const profitText = popup.querySelector("#profitText");
+        const confirm_btn = popup.querySelector(".confirm-btn");
+
+        // DOM elements
+        const priceInput = popup.querySelector("#priceInput");
+        const markBtn = popup.querySelector(".markbtn");
+        const bestBidBtn = popup.querySelector(".bestbidbtn");
+
+        const qty_alert = popup.querySelector(".qty_alert");
+
+        const MAX_QTY = 1;
+        let BASE_QTY = 1; // current position size
+
+
+
+        // 🔹 Market Tab Click
+        marketTab.onclick = () => {
+            order_type = "market_order";
+            marketTab.style.backgroundColor = "#3e3e3e";
+            marketTab.style.color = "#ffffff";
+            marketTab.style.fontWeight = "700";
+            marketTab.style.borderBottom = "2px solid #8b5cf6";
+
+            limitTab.style.backgroundColor = "#1c1c1c";
+            limitTab.style.color = "#bbb";
+            limitTab.style.fontWeight = "600";
+            limitTab.style.borderBottom = "none";
+
+            priceSection.style.display = "none";
+            iocCheckbox.style.display = "none";
+            iocLabel.style.display = "none";
+        };
+
+        // 🔹 Limit Tab Click
+        limitTab.onclick = () => {
+            order_type = "limit_order";
+            limitTab.style.backgroundColor = "#3e3e3e";
+            limitTab.style.color = "#ffffff";
+            limitTab.style.fontWeight = "700";
+            limitTab.style.borderBottom = "2px solid #8b5cf6";
+
+            marketTab.style.backgroundColor = "#1c1c1c";
+            marketTab.style.color = "#bbb";
+            marketTab.style.fontWeight = "600";
+            marketTab.style.borderBottom = "none";
+
+            priceSection.style.display = "block";
+            iocCheckbox.style.display = "inline-block";
+            iocLabel.style.display = "inline-block";
+        };
+
+
+
+        // ✅ Receive data from parent
+        document.addEventListener("popupDataReady", (e) => {
+            const data = e.detail;
+            console.log("Popup received data:", data);
+
+            // Example: update popup title dynamically
+            const headTitle = document.getElementById("head_tittle");
+            if (data.product_symbol && data.size) {
+                const isLong = data.size > 0;
+                headTitle.innerHTML = `Close <span style="color:${isLong ? "limegreen" : "red"}">${isLong ? "Long" : "Short"}</span> ${data.product_symbol}`;
+            }
+
+            // Calculate and display
+            const results = calculateTradeMetrics(data);
+            console.log("Breakeven Price:", results.breakevenPrice);
+            console.log("Expected Profit:", results.expectedProfit);
+
+            // // Example: fill prices if available
+            const valueDivs = popup.querySelectorAll(".value");
+            if (data.entry_price && valueDivs[0]) valueDivs[0].textContent = data.entry_price;
+            if (data.mark_price && valueDivs[1]) valueDivs[1].textContent = data.mark_price;
+            if (results.breakevenPrice && valueDivs[2]) valueDivs[2].textContent = results.breakevenPrice;
+
+            // if (results.expectedProfit && profitText) profitText.textContent = results.expectedProfit;
+
+            // // Example: adjust max qty
+            if (data.size !== undefined && data.size !== null) {
+                qtyInput.value = Math.abs(data.size);
+            }
+
+
+
+
+            // 🔹 Percent Button Logic
+            percentBtns.forEach(button => {
+                button.addEventListener('click', () => {
+
+                    // Reset all buttons
+                    percentBtns.forEach(btn => {
+                        btn.style.backgroundColor = "#2e2e2e";
+                        btn.style.color = "#bbb";
+                        btn.style.fontWeight = "normal";
+                        btn.style.border = "1px solid #2e2e2e";
+                    });
+
+                    // Highlight clicked button
+                    button.style.backgroundColor = "#8b5cf6";
+                    button.style.color = "#fff";
+                    button.style.fontWeight = "bold";
+                    button.style.border = "1px solid #8b5cf6";
+
+                    // Set quantity based on current qty with scaling
+                    const percent = parseFloat(button.getAttribute("data-percent"));
+                    const currentQty = Math.abs(parseFloat(data.size)) || 0; // Default to 10 if not set
+                    // console.log("currentQty :", currentQty)
+                    let calcQty = currentQty * percent;
+
+                    // Round to nearest integer
+                    calcQty = Math.round(calcQty);
+
+                    // Ensure minimum value is 1 and max is currentQty
+                    if (calcQty < 1) calcQty = 1;
+                    if (calcQty > currentQty) calcQty = currentQty;
+
+                    qtyInput.value = calcQty; // No decimals
+                    // console.log("calcQty :", calcQty)
+
+
+
+
+                });
+            });
+
+            ['input', 'change', 'focus', 'blur', 'paste'].forEach(event => {
+                qtyInput.addEventListener(event, () => {
+                    console.log("Quantity updated:", qtyInput.value);
+
+                    let currentQty = parseFloat(data.size) || 2; // Get current max qty
+                    currentQty = Math.abs(currentQty); // Convert to positive
+
+                    let inputValue = parseFloat(qtyInput.value) || 0;
+                    console.log("Input Value:", inputValue, "Current Qty:", currentQty);
+
+                    if (inputValue < 1) {
+                        console.log("inputValue", inputValue);
+                        qtyInput.value = 1; // Minimum value
+                    }
+
+                    if (inputValue > currentQty) {
+                        // this.value = currentQty; // Limit to currentQty
+                        qty_alert.style.display = "block";
+                        profitText.style.visibility = "hidden";    // লুকাবে কিন্তু জায়গা থাকবে
+
+
+                    } else if (inputValue <= currentQty) {
+                        qty_alert.style.display = "none";
+                        profitText.style.visibility = "visible";   // দেখাবে
+                    }
+
+                });
+            });
+
+
+
+
+
+
+        });
+
+
+        // ✅ Receive data from parent
+        document.addEventListener("popupDataupdate", (e) => {
+
+
+
+            const data = e.detail;
+            console.log("Popup received data:", data);
+
+            // Example: update popup title dynamically
+            const headTitle = document.getElementById("head_tittle");
+            if (data.product_symbol && data.size) {
+                const isLong = data.size > 0;
+                headTitle.innerHTML = `Close <span style="color:${isLong ? "limegreen" : "red"}">${isLong ? "Long" : "Short"}</span> ${data.product_symbol}`;
+            }
+
+            // Calculate and display
+            const results = calculateTradeMetrics(data);
+            // console.log("Breakeven Price:", results.breakevenPrice);
+            // console.log("Expected Profit:", results.expectedProfit);
+
+            // // Example: fill prices if available
+            const valueDivs = popup.querySelectorAll(".value");
+            if (data.entry_price && valueDivs[0]) valueDivs[0].textContent = data.entry_price;
+            if (data.mark_price && valueDivs[1]) valueDivs[1].textContent = data.mark_price;
+            if (results.breakevenPrice && valueDivs[2]) valueDivs[2].textContent = results.breakevenPrice;
+
+            // if (results.expectedProfit && profitText) profitText.textContent = results.expectedProfit;
+
+            // console.log(data.product.contract_value);
+
+            // contract_value = float(ticker.get("contract_value", 1))  // default 1
+            // entry_price = float(pos.get("entry_price", 0))
+            // size = float(pos.get("size", 0))
+
+            // let pnl = 0;
+
+            // if (order_type == "limit_order") {
+            //     if (data.size > 0) {
+            //         pnl = (priceInput.value - data.entry_price) * Math.abs(data.size) * data.product.contract_value;
+            //     } else {
+            //         pnl = (data.entry_price - priceInput.value) * Math.abs(data.size) * data.product.contract_value;
+            //     }
+            // } else {
+            //     if (data.size > 0) {
+            //         pnl = (data.mark_price - data.entry_price) * Math.abs(data.size) * data.product.contract_value;
+            //     } else {
+            //         pnl = (data.entry_price - data.mark_price) * Math.abs(data.size) * data.product.contract_value;
+            //     }
+            // }
+
+            const price = order_type === "limit_order" ? priceInput && priceInput.value == "" ? 0.00 : priceInput.value : data.mark_price;
+            const pnl = price == 0.00 ? 0.00 : Math.abs(qtyInput && qtyInput.value ? qtyInput.value : data.size) * data.product.contract_value *
+                ((data.size > 0 ? 1 : -1) * (price - data.entry_price));
+
+            if (profitText) profitText.style.color = data.unrealized_pnl < 0 ? 'red' : 'green';
+
+            console.log("pnl:", parseFloat(pnl.toFixed(3)).toString());
+            if (results.expectedProfit && profitText) profitText.textContent = parseFloat(pnl.toFixed(3)).toString();
+
+
+
+
+            // 🟩 "Mark" button click logic
+            markBtn.onclick = () => {
+                // alert(priceInput)
+                markBtn_checked = true;
+                bestBidBtn_checked = false;
+                priceInput.value = parseFloat(data.mark_price).toFixed(8);
+                markBtn.style.backgroundColor = "#2ecc71"; // green highlight
+                bestBidBtn.style.backgroundColor = "#3e3e3e"; // reset other
+            };
+
+            // 🟦 "Best Bid" button click logic
+            bestBidBtn.onclick = () => {
+                markBtn_checked = false;
+                bestBidBtn_checked = true;
+                console.log(data.quotes.best_bid)
+                priceInput.value = parseFloat(data.quotes.best_bid).toFixed(8);
+                bestBidBtn.style.backgroundColor = "#3498db"; // blue highlight
+                markBtn.style.backgroundColor = "#3e3e3e"; // reset other
+            };
+
+
+            if (markBtn_checked) {
+                // console.log(priceInput.value == parseFloat(data.mark_price).toFixed(8));
+                if (priceInput.value != parseFloat(data.mark_price).toFixed(8)) {
+                    markBtn.style.backgroundColor = "#3e3e3e"; // green highlight
+                    // markBtn_checked = false;
+                    return;
+                } else {
+                    markBtn.style.backgroundColor = "#3498db"; // green highlight
+                }
+
+                priceInput.value = parseFloat(data.mark_price).toFixed(8);
+            }
+            else if (bestBidBtn_checked) {
+                // console.log(priceInput.value != parseFloat(data.quotes.best_bid).toFixed(8));
+                if (priceInput.value != parseFloat(data.quotes.best_bid).toFixed(8)) {
+                    bestBidBtn.style.backgroundColor = "#3e3e3e"; // blue highlight
+                    // bestBidBtn_checked = false;
+                    return;
+                } else {
+                    bestBidBtn.style.backgroundColor = "#3498db"; // blue highlight
+                }
+                bestBidBtn.value = parseFloat(data.quotes.best_bid).toFixed(8);
+            } else { priceInput.value = "" }
+
+
+
+            confirm_btn.onclick = async () => {
+                const confirmClose = confirm(`Are you sure to close ${data.product_symbol}?`);
+                const size = qtyInput ? qtyInput.value : null;
+
+                // console.log("iocCheckbox :",iocCheckbox.checked)
+                const ioc = iocCheckbox.checked ? true : null;
+
+                order_type = order_type == "limit_order" ? order_type : null;
+                const limit_price = priceInput.value && priceInput.value != null ? priceInput.value : null;
+                if (order_type && !limit_price) {
+                    priceInput.focus(); // Focus on the input field
+                    notify("i", "limit price requared!");
+                } else {
+                    if (confirmClose) await closeTrade(data, size, order_type, limit_price, ioc);
+
+
+                    // if (confirmClose) await closeTrade(data, size, order_type,limit_price);
+                    // 🟡 Loading style directly via JS
+                    confirm_btn.disabled = true;
+                    confirm_btn.style.opacity = "0.8";
+                    confirm_btn.style.cursor = "not-allowed";
+                    confirm_btn.style.background = "#0062cc";
+                    confirm_btn.innerHTML = `<span id="spinner" style="
+        display:inline-block;
+        width:14px;
+        height:14px;
+        border:2px solid white;
+        border-top:2px solid transparent;
+        border-radius:50%;
+        margin-right:6px;
+        vertical-align:middle;
+        animation: spin 0.8s linear infinite;
+    "></span> Closing...`;
+
+                    // 🔁 Spinner animation (inject keyframes once)
+                    if (!document.getElementById("spin-style")) {
+                        const style = document.createElement("style");
+                        style.id = "spin-style";
+                        style.textContent = `
+            @keyframes spin {
+                to { transform: rotate(360deg); }
+            }
+        `;
+                        document.head.appendChild(style);
+                    }
+
+                }
+            };
+        });
+
+    })();
+
+
+    async function closeTrade(data, size, order_type, limit_price, ioc) {
+        const popup = document.querySelector(".popup");
+        const confirm_btn = popup.querySelector(".confirm-btn");
+        // console.log(this);
+        console.log("Closing position:", data);
+
+        // এখানে Delta API call করতে পারো
+
+        const body = {
+            // product_id: data.product_id,
+            product_symbol: data.product_symbol,
+            size: size ? size : Math.abs(data.size),   // ✅ ternary operator ঠিক করা হয়েছে
+            side: data.size < 0 ? "buy" : "sell",
+            order_type: order_type ? order_type : "market_order", // ✅ এখানে-ও ঠিক করা হয়েছে
+            ...(order_type === "limit_order" && limit_price && { limit_price: limit_price }), // Conditional property
+            ...(order_type === "limit_order" && ioc && { time_in_force: "IOC" }), // Conditional property
+            reduce_only: true
+        };
+        // if (order_type === "limit_order") {
+        //     body.limit_price = "59000";
+        // }
+        console.log(body)
+
+
+        // const timestamp = String(Math.floor(Date.now() / 1000));
+        // const signaturePayload = "POST" + timestamp + "/v2/orders" + JSON.stringify(body);
+        // const signature = await generateSignature(signaturePayload); // Implement this function
+
+        // await get_api_data("/v2/orders", body, "POST");
+
+
+
+        const res = await fetch(APP_URL + "/v2/orders", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"  // যোগ করা হয়েছে
+            },
+            body: JSON.stringify(body) // body অবশ্যই string আকারে
+        });
+
+        if (!res.ok) {
+            throw new Error("Unauthorized or fetch error");
+            window.closeModal();
+            notify("e", `error close ${data.product_symbol}.`);
+        }
+        const result = await res.json();
+        console.log("result :", result)
+        state = result.state;
+
+
+
+
+        if (state == "filled" || state == "closed") {
+            console.log("✅ Closed:", data.product_symbol, result)
+
+
+            confirm_btn.classList.remove("loading"); // loading শেষ
+            console.log(result);
+            window.closeModal();
+            notify("s", `✅ Closed ${data.product_symbol}`);
+            await get_positions();
+        }
+        else if (state == "cancelled") {
+            let reason = result.cancellation_reason;
+            console.log("⚠️ cancelled:", data.product_symbol)
+            notify("e", `⚠️ cancelled ${data.product_symbol}\n${reason ? reason : ''}`);
+            window.closeModal();
+            await get_positions();
+            return;
+        }
+        else {
+            console.log("state :", state)
+            console.log("⚠️ Failed to close:", data.product_symbol)
+            notify("e", `⚠️ Failed to close ${data.product_symbol}`);
+            await get_positions();
+        }
+
+    }
+</script>
