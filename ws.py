@@ -3389,9 +3389,10 @@ class MultiUserManager:
 
         
 
-        print("user  id problem :",self.clients[user_id]["delta"],"\n",self.clients.get(user_id, {}).get("delta"))
+        print("user  id problem :",self.clients.get(user_id, {}).get("delta"))
 
-        client = self.clients[user_id]["delta"]
+        # client = self.clients[user_id]["delta"]
+        client = self.clients.get(user_id, {}).get("delta")
 
         # client_map = self.clients.get(user_id)
         # if not client_map or not client_map.get("delta"):
