@@ -5125,26 +5125,52 @@
             try {
                 const res = await fetch("/v2/wallet/balances?token=" + token);
                 if (!res.ok) throw new Error("Unauthorized or fetch error");
-                const data = await res.json();
 
-                // 🔍 Find USD & INR
+                const json = await res.json();
+                const data = Array.isArray(json) ? json : json.result || [];
+
                 const usd = data.find(a => a.asset_symbol === "USD");
-                // const inr = data.find(a => a.asset_symbol === "INR");
 
                 document.getElementById("usd").textContent =
                     usd ? Number(usd.available_balance).toFixed(2) : "0";
 
                 document.getElementById("inr").textContent =
-                    usd ? Number(usd.available_balance_inr).toFixed(2) : "error";
+                    usd ? Number(usd.available_balance_inr || 0).toFixed(2) : "0";
 
-                // console.log(data[0]);
-                return usd ? Number(usd.available_balance).toFixed(2) : "0"
+                return usd ? Number(usd.available_balance).toFixed(2) : "0";
 
             } catch (err) {
-                console.error("Error fetching data:", err);
-                return "error"
+                console.error("Error fetching balance:", err);
+                return "error";
             }
         }
+
+
+
+        // async function get_balance() {
+        //     try {
+        //         const res = await fetch("/v2/wallet/balances?token=" + token);
+        //         if (!res.ok) throw new Error("Unauthorized or fetch error");
+        //         const data = await res.json();
+
+        //         // 🔍 Find USD & INR
+        //         const usd = data.find(a => a.asset_symbol === "USD");
+        //         // const inr = data.find(a => a.asset_symbol === "INR");
+
+        //         document.getElementById("usd").textContent =
+        //             usd ? Number(usd.available_balance).toFixed(2) : "0";
+
+        //         document.getElementById("inr").textContent =
+        //             usd ? Number(usd.available_balance_inr).toFixed(2) : "error";
+
+        //         // console.log(data[0]);
+        //         return usd ? Number(usd.available_balance).toFixed(2) : "0"
+
+        //     } catch (err) {
+        //         console.error("Error fetching data:", err);
+        //         return "error"
+        //     }
+        // }
 
 
         async function get_balance_dcx() {
