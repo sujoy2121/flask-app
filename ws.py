@@ -1566,7 +1566,11 @@ class MultiUserManager:
                         "api_secret": delta["api_secret"]
                     }
 
+                    print("👤 checking user:", user_id)
+                    print("delta:", delta)
+
                     if not self._validate_api_key(user):
+                        print("❌ API INVALID for user", user_id)
                         continue
 
                     self.users[user_id] = user
