@@ -28,6 +28,7 @@ firebase-admin>=6.4
 # Crypto / Exchange
 # ======================
 delta-rest-client
+websocket-client
 
 # ======================
 # Optional / Safety
