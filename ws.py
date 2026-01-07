@@ -3389,16 +3389,18 @@ class MultiUserManager:
 
         
 
-        print("user  id problem :",self.clients.get(user_id, {}).get("delta"))
+        print("user  id problem :",self.clients.get(user_id))
 
         # client = self.clients[user_id]["delta"]
-        client = self.clients.get(user_id, {}).get("delta")
+        # client = self.clients.get(user_id, {}).get("delta")
 
-        # client_map = self.clients.get(user_id)
-        # if not client_map or not client_map.get("delta"):
-        #     return {"success": False, "error": "user_not_initialized"}
+        client_map = self.clients.get(user_id)
+        if not client_map or not client_map.get("delta"):
+            return {"success": False, "error": "user_not_initialized"}
         
-        # client = client_map["delta"]
+        client = client_map["delta"]
+
+
 
         api_key = client.api_key
         api_secret = client.api_secret
