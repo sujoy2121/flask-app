@@ -1217,13 +1217,13 @@ class MultiUserManager:
         # self.lock = threading.Lock()
         self.db_ref = db.reference('/strategies')  # Firebase-এর strategies পাথ
 
+        self._load_initial_users()  # ✅ MUST
+
         self._refreshing = set()
         # self._refresh_lock = threading.Lock()
 
         self._refresh_lock = Semaphore()
 
-
-        self._load_initial_users()
 
         
          # ✅ START PUBLIC WS HERE (ONE TIME)
@@ -1598,7 +1598,7 @@ class MultiUserManager:
                         manager=self
                     )
 
-                    print("data =",self.clients[user_id]["delta"])
+                    # print("data =",self.clients[user_id]["delta"])
 
                     # ======================
                     # 🟢 DCX CONFIG (OPTIONAL)
@@ -1617,6 +1617,7 @@ class MultiUserManager:
                     logging.info(f"[ম্যানেজার] Loaded user {user_id}")
 
                 logging.info(f"[ম্যানেজার] Initial users loaded: {len(self.users)}")
+                logging.info(f"[ম্যানেজার] clients loaded: {list(self.clients.keys())}")
 
             except Exception as e:
                 logging.error(f"[ম্যানেজার] Load error: {e}")
@@ -3391,24 +3392,31 @@ class MultiUserManager:
         user_id = str(user_id)
 
         print(f"[{user_id}] 🌐 API Request → {method} {path}")
+        print("clients keys:", list(self.clients.keys()))
 
-        
-        print("clint :",self.clients)
-        print("user  id problem :",self.clients.get(user_id))
-        print("clint :",self.clients[user_id])
+        client_map = self.clients.get(user_id)
+
+        if not client_map:
+            return {
+                "success": False,
+                "error": "user_not_initialized",
+                "reason": "client_map_missing"
+            }
+
+        if not client_map.get("delta"):
+            return {
+                "success": False,
+                "error": "user_not_initialized",
+                "reason": "delta_client_missing"
+            }
+
+        client = client_map["delta"]
+        # 👉 এখান থেকে safe
         
         # client = self.clients[user_id]["delta"]
         # client = self.clients.get(user_id, {}).get("delta")
 
-        client_map = self.clients.get(user_id)
-        if not client_map or not client_map.get("delta"):
-            return {"success": False, "error": "user_not_initialized"}
         
-        client = client_map["delta"]
-
-        print("clint 1:",client)
-
-        print("api key 1:",client.api_key)
 
         api_key = client.api_key
         api_secret = client.api_secret
