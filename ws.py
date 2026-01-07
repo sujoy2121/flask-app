@@ -1617,7 +1617,7 @@ class MultiUserManager:
                     logging.info(f"[ম্যানেজার] Loaded user {user_id}")
 
                 logging.info(f"[ম্যানেজার] Initial users loaded: {len(self.users)}")
-                logging.info(f"[ম্যানেজার] clients loaded: {list(self.clients.keys())}")
+                print(f"[ম্যানেজার] clients loaded: {list(self.clients.keys())}")
 
             except Exception as e:
                 logging.error(f"[ম্যানেজার] Load error: {e}")
