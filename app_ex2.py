@@ -820,6 +820,10 @@ def prepare_trade(user_id, leg):
         print("✅ Leverage confirmed")
         return True
 
+    else:
+        return True
+
+
 
 
 
@@ -1175,9 +1179,15 @@ def strategy_runner(user_id):
                                 "qty": leg.get("qty"),
                                 "order_id": order.get("id"),
                                 "state": order.get("state"),
-                                "timestamp": order.get("updated_at") or datetime.now().isoformat()
+                                "timestamp": order.get("created_at") or datetime.now().isoformat()
                             })
                         last_signal = "BUY"
+
+                        db.reference(f"strategies/{user_id}").update({
+                            "pnl": pnl,
+                            "last_signal": last_signal,
+                            "positions": positions
+                        })
 
                     elif signal == "EXIT":
 
@@ -1191,7 +1201,7 @@ def strategy_runner(user_id):
                             "brocker": broker,
                             "contact": leg.get("contact"),
                             "side": "EXIT",
-                            "timestamp": order.get("updated_at") or datetime.now().isoformat()
+                            "timestamp": order.get("created_at") or datetime.now().isoformat()
                         })
                         last_signal = "EXIT"
 

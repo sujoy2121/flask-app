@@ -2659,7 +2659,7 @@
                         console.log("data :", brocker_contact)
                         console.log("data 2:", clone.querySelector(`select[name^="brocker_contact-${legCount}"]`))
 
-                        brocker_contact?.selectedIndex = clone.querySelector(`select[name^="brocker_contact-${legCount}"]`)?.selectedIndex;
+                        // brocker_contact?.selectedIndex = clone.querySelector(`select[name^="brocker_contact-${legCount}"]`)?.selectedIndex;
 
                     }
 
@@ -5409,7 +5409,7 @@
         checkServerStatus();
 
         // Then run every 10 seconds
-        setInterval(checkServerStatus, 10000);
+        setInterval(checkServerStatus, 15000);
 
     </script>
 
