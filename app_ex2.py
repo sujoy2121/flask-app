@@ -38,6 +38,9 @@ from delta_rest_client import DeltaRestClient,OrderType,TimeInForce
 from collections import defaultdict
 # from concurrent.futures import ThreadPoolExecutor
 
+from collections import OrderedDict
+from gevent.lock import Semaphore
+
 
 from gevent.pool import Pool
 
@@ -821,9 +824,9 @@ def prepare_trade(user_id, leg):
 
 
 
-def execute_signal(user_id, item, prepared_trades, prepare_key):
+def execute_signal(user_id, item):
 
-    print("prepare_key :",prepare_key)
+    # print("prepare_key :",prepare_key)
 
     leg = item["leg"]
     signal = item["signal"]
@@ -878,17 +881,17 @@ def execute_signal(user_id, item, prepared_trades, prepare_key):
             
             print("product_id :",product_id)
 
-            if prepare_key not in prepared_trades:
-                prepared_trades[prepare_key] = False  # reserve first
+            # if prepare_key not in prepared_trades:
+            #     prepared_trades[prepare_key] = False  # reserve first
 
-                set_laverage = manager.set_laverage(
-                    user_id=str(user_id),
-                    product_id=str(product_id),
-                    leverage=int(leverage)
-                )
+            #     set_laverage = manager.set_laverage(
+            #         user_id=str(user_id),
+            #         product_id=str(product_id),
+            #         leverage=int(leverage)
+            #     )
 
-                prepared_trades[prepare_key] = set_laverage.get("success", False)
-                print("Set Leverage Responce :",set_laverage["success"] or set_laverage["error"])
+            #     prepared_trades[prepare_key] = set_laverage.get("success", False)
+            #     print("Set Leverage Responce :",set_laverage["success"] or set_laverage["error"])
 
             # if not prepared_trades or prepared_trades.get(prepare_key) is False:
 
@@ -977,7 +980,7 @@ def execute_signal(user_id, item, prepared_trades, prepare_key):
 
 
 def fb_get(ref):
-    gevent.sleep(0)
+    gevent.sleep(0.001)   # minimum safe
     return ref.get()
 
 
@@ -988,7 +991,9 @@ def fb_get(ref):
 def strategy_runner(user_id):
     print(f"🚀 Strategy runner started for user {user_id}")
 
-    executed_signals = {}
+    # executed_signals = {}
+    executed_signals = OrderedDict()
+
     positions = []
     pnl = 0.0
     last_signal = "NONE"
@@ -996,9 +1001,17 @@ def strategy_runner(user_id):
     # prepared_trades = set()   # keys which are prepared
     prepared_trades = {}   # dict: prepare_key -> True / Fals
 
+    prepare_lock = Semaphore()
+
     while True:
-        if len(executed_signals) > 5000:
-            executed_signals.clear()
+        # prune old
+        MAX_EXECUTED = 2000
+        while len(executed_signals) > MAX_EXECUTED:
+            executed_signals.popitem(last=False)
+
+        if len(prepared_trades) > 1000:
+            prepared_trades.clear()
+    
 
         try:
             running = fb_get(db.reference(f"strategies/{user_id}/running"))
@@ -1041,12 +1054,26 @@ def strategy_runner(user_id):
                     prepare_key = f"{user_id}_{leg_id}_{action_time}_{broker}"
 
                     # 🔹 PREPARE PHASE
+                    # if should_prepare_trade(action_time, prepare_key in prepared_trades):
+                    #     ok = prepare_trade(user_id, leg)
+                    #     # prepared_trades.add(prepare_key)
+                    #     prepared_trades[prepare_key] = ok
+
                     if should_prepare_trade(action_time, prepare_key in prepared_trades):
-                        ok = prepare_trade(user_id, leg)
-                        # prepared_trades.add(prepare_key)
-                        prepared_trades[prepare_key] = ok
+                        with prepare_lock:
+                            if prepare_key not in prepared_trades:
+                                prepared_trades[prepare_key] = prepare_trade(user_id, leg)
+    
 
                     if should_trigger_on_time_strict(action_time, key, executed_signals):
+
+                        # 🔴 EXECUTION GATE (HERE)
+                        if prepared_trades.get(prepare_key) is not True:
+                            print(
+                                f"⛔ SKIP EXECUTE | prepare failed | {prepare_key}"
+                            )
+                            continue   # ❗ execute_signal ডাকাই হবে না
+
                         time_bucket[action_time].append({
                             "key": key,
                             "leg": leg,
@@ -1078,7 +1105,8 @@ def strategy_runner(user_id):
 
                 # mark executed
                 for item in items:
-                    executed_signals[item["key"]] = True
+                    # executed_signals[item["key"]] = True
+                    executed_signals[item["key"]] = time.time()
 
 
                     # /////////////////////////////////
@@ -1101,9 +1129,9 @@ def strategy_runner(user_id):
                     pool.spawn(
                         execute_signal,
                         user_id,
-                        item,
-                        prepared_trades,
-                        f"{user_id}_{item['leg'].get('legId')}_{action_time}_{item['brocker']}"
+                        item
+                        # prepared_trades,
+                        # f"{user_id}_{item['leg'].get('legId')}_{action_time}_{item['brocker']}"
                     )
                     for item in items
                 ]
@@ -1174,7 +1202,7 @@ def strategy_runner(user_id):
                 })
 
             # gevent.sleep(0.2)
-            gevent.sleep(0.2)
+            gevent.sleep(0.3)   # minimum safe on Windows
 
             time_bucket.clear()
 
@@ -1373,13 +1401,15 @@ def remove_leg():
                 # g.kill(block=False)
                 # del strategy_threads[user_id]
 
-                g = strategy_threads.get(user_id)
+                # g = strategy_threads.get(user_id)
                 # if g and not g.dead:
                 #     g.kill(block=False)
-                if g and not g.dead:
-                    g.kill()
-                    gevent.sleep(0)
+                # if g and not g.dead:
+                #     g.kill()
+                user_strategy_ref.update({"running": False})
                 strategy_threads.pop(user_id, None)
+                gevent.sleep(0.001)   # minimum safe
+
 
 
         user_strategy_ref.update(updates)
@@ -2186,8 +2216,12 @@ def control():
             # del strategy_threads[user_id]
 
             g = strategy_threads.get(user_id)
-            if g and not g.dead:
-                g.kill(block=False)
+            # if g and not g.dead:
+            #     g.kill(block=False)
+            # only signal stop
+            user_ref.update({"running": False})
+
+            # DO NOT kill
             strategy_threads.pop(user_id, None)
 
         
@@ -2327,7 +2361,7 @@ print("Your access token:", SECRET_TOKEN)
 
 def get_public_ip():
     try:
-        gevent.sleep(0)
+        gevent.sleep(0.001)   # minimum safe
         return requests.get("https://api.ipify.org", timeout=3).text
     except:
         return "Unavailable"

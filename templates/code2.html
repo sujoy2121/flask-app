@@ -2032,14 +2032,13 @@
             if (!leg) return null;
 
             const brokerSelect = document.querySelector('#Brocker select');
-            const option = brokerSelect.options[brokerSelect.selectedIndex];
+            const option = brokerSelect?.options[brokerSelect.selectedIndex];
 
             const legData = {
                 id: random_id,
                 brocker: leg.querySelector('select[name^="brocker_contact-"]')?.closest('.field')?.offsetParent
-                    ? leg.querySelector('select[name^="brocker_contact-"]').selectedOptions[0].text
-                    : null
-                    || option?.value,
+                    ? leg.querySelector('select[name^="brocker_contact-"]')?.selectedOptions?.[0]?.text || option?.value
+                    : option?.value,
                 Brocker: leg.querySelector('select[name^="brocker_contact-"]')?.closest('.field')?.offsetParent
                     ? leg.querySelector('select[name^="brocker_contact-"]').selectedOptions[0].text
                     : null
@@ -2596,7 +2595,7 @@
                     const lPriceToggle = clone.querySelector(`#l-price-toggle-${oldLegId}`);
                     const bestBidToggle = clone.querySelector(`#best-bid-toggle-${oldLegId}`);
 
-                    const brocker_contact = clone.querySelector(`select[name^="brocker_contact-${oldLegId}"]`)
+                    const brocker_contact = clone.querySelector(`select[name^="brocker_contact-${oldLegId}"]`);
 
                     const qtyField = clone.querySelector(`.qty-${oldLegId}`);
                     const priceField = clone.querySelector(`.price-${oldLegId}`);
@@ -2655,6 +2654,14 @@
                     // console.log(legCount)
 
                     if (brocker_contact) brocker_contact.name = `brocker_contact-${legCount}`;
+                    if (brocker_contact) {
+                        // const contactSelect = clone.querySelector(`select[name^="brocker_contact-${oldLegId}"]`);
+                        console.log("data :", brocker_contact)
+                        console.log("data 2:", clone.querySelector(`select[name^="brocker_contact-${legCount}"]`))
+
+                        brocker_contact?.selectedIndex = clone.querySelector(`select[name^="brocker_contact-${legCount}"]`)?.selectedIndex;
+
+                    }
 
 
 
@@ -4787,8 +4794,13 @@
                 } else {
                     if (lPriceInput.value <= ticker?.price_band?.upper_limit) {
                         clearError(lPriceInput);
-                    } else {
+                    } else if (broker != "Dcx") {
                         setError(lPriceInput, "Max Buy " + truncateStr(ticker?.price_band?.upper_limit, 5));
+                    } else if (broker == "Dcx") {
+                        clearError(lPriceInput);
+                        //  checking max input price ...
+                    } else {
+                        clearError(lPriceInput);
                     }
                     // console.log("ticker :", ticker?.price_band?.upper_limit);
 
