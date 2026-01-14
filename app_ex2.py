@@ -116,7 +116,7 @@ from arbitrage import build_arbitrage_payload
 
 
 data_store.clear()
-manager = MultiUserManager()
+# manager = MultiUserManager()
 # manager.start_all()  # WebSocket start
 
 # Firebase config
@@ -153,8 +153,10 @@ strategy_threads = {}
 
 
 # Firebase থেকে strategies node থেকে সব data fetch
-strategies = db.reference("strategies").get() or {}  # None হলে খালি dict
+# strategies = db.reference("strategies").get() or {}  # None হলে খালি dict
 
+strategies = {}
+manager = None
 
 # ----------------------------
 # Run Server
@@ -2946,12 +2948,27 @@ def catch_all(path,user_id="1"):
 
 # -----------------------------
 
+def init_system():
+    print("🔥 Fetching Firebase strategies...")
+    strategies = db.reference("strategies").get() or {}
+
+    manager = MultiUserManager()
+
+    return strategies, manager
+
+
 def confirm_start_loop():
     while True:
-        ans = input(
+        public_ip = get_public_ip()
+
+        prompt = (
+            f"\n🌐 Public IP: {public_ip}\n"
+            "🔍 Check IP watchlisted or not\n\n"
             "⚠ Server start করবেন?\n"
             "[y] Yes  |  [n] No  |  [r] Retry : "
-        ).strip().lower()
+        )
+
+        ans = input(prompt).strip().lower()
 
         if ans in ("y", "yes"):
             return True
@@ -2967,6 +2984,7 @@ def confirm_start_loop():
             print("❌ ভুল input, আবার চেষ্টা করুন\n")
 
 
+
 if __name__ == "__main__":
 
     if not confirm_start_loop():
@@ -2976,6 +2994,9 @@ if __name__ == "__main__":
     print("✅ Confirmation accepted. Starting server...\n")
 
     print("✅ Starting server on Windows using gevent.pywsgi")
+
+    # 🔥 NOW initialize
+    strategies, manager = init_system()
 
     # start websocket + background monitor ONLY ONCE
     manager.start_all()
