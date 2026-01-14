@@ -2758,6 +2758,9 @@ a {{ color:#58a6ff; }}
 @app.route("/<path:path>", methods=["GET", "POST"])
 def catch_all(path,user_id="1"):
 
+    if path == "":
+        return jsonify({"status": "server alive"}), 200
+
     user_id = str(user_id)   # ✅ এখানেই
     # ensure_user_initialized(user_id)
 
