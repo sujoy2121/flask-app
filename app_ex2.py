@@ -13,6 +13,7 @@ from flask import Flask, jsonify, render_template_string, render_template, reque
 from flask_cors import CORS
 # import threading
 import time
+import sys
 
 # from gevent import time as gtime
 import random
@@ -2945,10 +2946,35 @@ def catch_all(path,user_id="1"):
 
 # -----------------------------
 
+def confirm_start_loop():
+    while True:
+        ans = input(
+            "⚠ Server start করবেন?\n"
+            "[y] Yes  |  [n] No  |  [r] Retry : "
+        ).strip().lower()
 
+        if ans in ("y", "yes"):
+            return True
+
+        elif ans in ("n", "no"):
+            return False
+
+        elif ans in ("r", "retry"):
+            print("🔁 আবার confirm চাওয়া হচ্ছে...\n")
+            continue
+
+        else:
+            print("❌ ভুল input, আবার চেষ্টা করুন\n")
 
 
 if __name__ == "__main__":
+
+    if not confirm_start_loop():
+        print("⛔ Server start cancelled")
+        sys.exit(0)
+
+    print("✅ Confirmation accepted. Starting server...\n")
+
     print("✅ Starting server on Windows using gevent.pywsgi")
 
     # start websocket + background monitor ONLY ONCE
