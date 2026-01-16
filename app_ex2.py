@@ -2100,7 +2100,9 @@ def funding_api():
         # 📡 get binance funding data
         # bn_data = get_binance_funding_safe(binance_symbol)
         bn_data = get_live_binance_funding(binance_symbol)
-        # print(bn_data)
+        # print("bn_data :1",bn_data)
+        # print("bn_data :2",bn_data["next_funding_time"])
+        # print("bn_data :3",bn_data[sym]["next_funding_time"])
         if not bn_data:
             continue
         # //////////////////////////////

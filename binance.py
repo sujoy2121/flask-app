@@ -230,9 +230,17 @@ def get_live_binance_funding(symbols=None):
         bn_sym = dcx_to_binance_symbol(sym)
         if bn_sym and bn_sym in all_data:
             result[sym] = all_data[bn_sym]
+            result = all_data[bn_sym]
         else:
             # result[sym] = {"error": "symbol not found"}
-            result[sym] = {
+            # result[sym] = {
+            #     "symbol": sym,
+            #     "funding_rate": None,
+            #     "next_funding_time": None,
+            #     "mark_price": None,
+            #     "error": "symbol not found"
+            # }
+            result = {
                 "symbol": sym,
                 "funding_rate": None,
                 "next_funding_time": None,
