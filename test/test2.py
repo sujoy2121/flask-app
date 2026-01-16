@@ -30,7 +30,7 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from binance import get_binance_funding,dcx_to_binance_symbol,get_binance_funding_safe,get_live_binance_funding
 
-data = get_binance_funding_safe("BTCUSDT")
+data = get_live_binance_funding("BTCUSDT")
 print("data : ",data)
 
 

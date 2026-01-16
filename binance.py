@@ -150,6 +150,10 @@ def get_live_binance_funding(symbols=None):
       ["BTCUSDT","ETHUSDT"] → filtered
     """
 
+     # 🔥 FIX: single string → list
+    if isinstance(symbols, str):
+        symbols = [symbols]
+
     # 1️⃣ ALL symbols
     if not symbols or symbols == ["all"]:
         symbols = get_all_binance_futures_symbols()
