@@ -1,6 +1,6 @@
 import requests
 from datetime import datetime, timezone
-
+import time 
 
 # def get_binance_funding(symbol="BTCUSDT"):
 #     url = "https://fapi.binance.com/fapi/v1/premiumIndex"
@@ -143,37 +143,101 @@ def get_all_binance_futures_symbols():
     return symbols
 
 
-def get_live_binance_funding(symbols=None):
-    """
-    symbols:
-      None / ["all"]  → all Binance USDT-M perpetuals
-      ["BTCUSDT","ETHUSDT"] → filtered
-    """
 
-     # 🔥 FIX: single string → list
-    if isinstance(symbols, str):
-        symbols = [symbols]
 
-    # 1️⃣ ALL symbols
-    if not symbols or symbols == ["all"]:
-        symbols = get_all_binance_futures_symbols()
+# //////////////////////////////////////////////////////////
+
+
+# def get_live_binance_funding(symbols=None):
+#     """
+#     symbols:
+#       None / ["all"]  → all Binance USDT-M perpetuals
+#       ["BTCUSDT","ETHUSDT"] → filtered
+#     """
+
+#      # 🔥 FIX: single string → list
+#     if isinstance(symbols, str):
+#         symbols = [symbols]
+
+#     # 1️⃣ ALL symbols
+#     if not symbols or symbols == ["all"]:
+#         symbols = get_all_binance_futures_symbols()
+
+#     result = {}
+
+#     for sym in symbols:
+#         try:
+#             bn_sym = dcx_to_binance_symbol(sym)   # 🔥 FIX
+#             data = get_binance_funding(bn_sym)
+#             result[sym] = data
+#         except Exception as e:
+#             result[sym] = {
+#                 "error": str(e)
+#             }
+
+#     return result
+
+
+def get_all_binance_funding():
+    url = "https://fapi.binance.com/fapi/v1/premiumIndex"
+    r = requests.get(url, timeout=10)
+    r.raise_for_status()
+
+    data = r.json()   # LIST of all symbols
 
     result = {}
-
-    for sym in symbols:
-        try:
-            bn_sym = dcx_to_binance_symbol(sym)   # 🔥 FIX
-            data = get_binance_funding(bn_sym)
-            result[sym] = data
-        except Exception as e:
-            result[sym] = {
-                "error": str(e)
-            }
+    for d in data:
+        result[d["symbol"]] = {
+            "symbol": d["symbol"],
+            "funding_rate": float(d["lastFundingRate"]),
+            "next_funding_time": d["nextFundingTime"],
+            "mark_price": float(d["markPrice"]),
+        }
 
     return result
 
 
 
+BINANCE_ALL_CACHE = {
+    "data": {},
+    "ts": 0
+}
+
+
+def get_live_binance_funding(symbols=None):
+
+    if isinstance(symbols, str):
+        symbols = [symbols]
+
+    now = time.time()
+
+    if not BINANCE_ALL_CACHE["data"] or now - BINANCE_ALL_CACHE["ts"] > 30:
+        try:
+            BINANCE_ALL_CACHE["data"] = get_all_binance_funding()
+            BINANCE_ALL_CACHE["ts"] = now
+        except Exception as e:
+            print("⚠ Binance fetch failed, using cached data:", e)
+
+    all_data = BINANCE_ALL_CACHE["data"]
+
+    if not symbols or symbols == ["all"]:
+        return all_data
+
+    result = {}
+    for sym in symbols:
+        if not sym:
+            continue
+        bn_sym = dcx_to_binance_symbol(sym)
+        if bn_sym and bn_sym in all_data:
+            result[sym] = all_data[bn_sym]
+        else:
+            result[sym] = {"error": "symbol not found"}
+
+    return result
+
+
+
+# //////////////////////////////////////////////////////////
 
 # if __name__ == "__main__":
 
