@@ -7,9 +7,9 @@ from logging.handlers import TimedRotatingFileHandler
 
 
 
-
 # import queue
-from flask import Flask, jsonify, render_template_string, render_template, request, abort,make_response
+from flask import Flask, jsonify, render_template_string, render_template, request, abort,make_response, current_app
+
 from flask_cors import CORS
 # import threading
 import time
@@ -95,6 +95,26 @@ logger.addHandler(console)
 
 # =================================================
 
+
+
+# ================= SANITIZE HELPER =================
+
+MAX_LEN = 1000   # log flood protection
+
+def sanitize(val):
+    if val is None:
+        return None
+
+    val = str(val)
+
+    # trim huge payload
+    if len(val) > MAX_LEN:
+        val = val[:MAX_LEN] + "…[truncated]"
+
+    # escape HTML / JS
+    return html.escape(val)
+
+# ===================================================
 
 
 
@@ -2745,6 +2765,36 @@ a {{ color:#58a6ff; }}
 # @app.route("/user")
 # def user():
 #     return render_template("code2.html", token=SECRET_TOKEN)
+
+
+
+
+@app.route("/client-error", methods=["POST"])
+def client_error():
+    data = request.get_json() or {}
+
+    # 🔐 production mode check
+    if not app.debug:
+        data = {
+            k: sanitize(v)
+            for k, v in data.items()
+            if k in {
+                "type",
+                "message",
+                "source",
+                "line",
+                "column",
+                "url",
+                "reason"
+            }
+        }
+
+    logger.error(
+        "🌐 CLIENT ERROR\n" +
+        "\n".join(f"{k}: {v}" for k, v in data.items())
+    )
+
+    return jsonify({"ok": True})
 
 
 

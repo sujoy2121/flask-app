@@ -5745,6 +5745,51 @@
 
 
 
+
+    <!-- //// error logs .. -->
+
+
+    <script>
+        window.onerror = function (message, source, lineno, colno, error) {
+            fetch("/client-error", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    type: "JS_ERROR",
+                    message: message,
+                    source: source,
+                    line: lineno,
+                    column: colno,
+                    stack: error ? error.stack : null,
+                    url: window.location.href,
+                    userAgent: navigator.userAgent
+                })
+            });
+        };
+
+
+    </script>
+
+
+    <script>
+        window.addEventListener("unhandledrejection", function (event) {
+            fetch("/client-error", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    type: "PROMISE_REJECTION",
+                    reason: event.reason?.message || event.reason,
+                    stack: event.reason?.stack || null,
+                    url: window.location.href
+                })
+            });
+        });
+    </script>
+
+
+
 </body>
 
 </html>
