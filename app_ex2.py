@@ -156,7 +156,7 @@ def sanitize(val):
 
 # from ex import get_api_data, get_api_dcx, get_live_funding_data, get_live_ticker
 
-from binance import get_binance_funding,dcx_to_binance_symbol,get_binance_funding_safe,get_live_binance_funding
+from binance import get_binance_funding,dcx_to_binance_symbol,get_binance_funding_safe,get_all_binance_funding,get_live_binance_funding
 from dcx import get_dcx_funding_rate,dcx_map_builder,arbitrage_signal,countdown_from_ms,get_balance_dcx,get_futures_balance_dcx,get_current_funding_rate,get_futures_instrument_data,get_futures_instrument_data_multi,get_live_dcx_funding,place_futures_order,normalize_pair,smart_close_by_pair
 from ws import MultiUserManager, show_user_data, update_unrealized_pnl_for_user, data_store,data_lock
 from arbitrage import build_arbitrage_payload
@@ -2098,7 +2098,8 @@ def funding_api():
         # print("sym :",binance_symbol)
 
         # 📡 get binance funding data
-        bn_data = get_binance_funding_safe(binance_symbol)
+        # bn_data = get_binance_funding_safe(binance_symbol)
+        bn_data = get_live_binance_funding(binance_symbol)
         # print(bn_data)
         if not bn_data:
             continue

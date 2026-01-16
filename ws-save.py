@@ -24,7 +24,7 @@ from dcx_client import DcxRestClient
 
 
 from dcx import get_dcx_funding_rate,dcx_map_builder,arbitrage_signal,countdown_from_ms,get_balance_dcx,get_futures_balance_dcx,get_current_funding_rate,get_futures_instrument_data,get_futures_instrument_data_multi,get_live_dcx_funding,place_futures_order,normalize_pair,smart_close_by_pair
-from binance import get_binance_funding,dcx_to_binance_symbol,get_binance_funding_safe
+from binance import get_binance_funding,dcx_to_binance_symbol,get_binance_funding_safe,get_live_binance_funding
 
 # Thread pool with max 5 workers
 executor = ThreadPoolExecutor(max_workers=5)
@@ -3175,7 +3175,8 @@ class MultiUserManager:
             # print("sym :",binance_symbol)
 
             # 📡 get binance funding data
-            bn_data = get_binance_funding_safe(binance_symbol)
+            # bn_data = get_binance_funding_safe(binance_symbol)
+            bn_data = get_live_binance_funding(binance_symbol)
             # print(bn_data)
             if not bn_data:
                 continue

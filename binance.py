@@ -126,21 +126,21 @@ def dcx_to_binance_symbol(symbol: str):
 
 
 
-def get_all_binance_futures_symbols():
-    url = "https://fapi.binance.com/fapi/v1/exchangeInfo"
-    r = requests.get(url, timeout=10)
-    r.raise_for_status()
-    data = r.json()
+# def get_all_binance_futures_symbols():
+#     url = "https://fapi.binance.com/fapi/v1/exchangeInfo"
+#     r = requests.get(url, timeout=10)
+#     r.raise_for_status()
+#     data = r.json()
 
-    symbols = [
-        s["symbol"]
-        for s in data["symbols"]
-        if s["contractType"] == "PERPETUAL"
-        and s["quoteAsset"] == "USDT"
-        and s["status"] == "TRADING"
-    ]
+#     symbols = [
+#         s["symbol"]
+#         for s in data["symbols"]
+#         if s["contractType"] == "PERPETUAL"
+#         and s["quoteAsset"] == "USDT"
+#         and s["status"] == "TRADING"
+#     ]
 
-    return symbols
+#     return symbols
 
 
 
