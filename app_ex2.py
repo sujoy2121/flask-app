@@ -51,6 +51,23 @@ import html
 import re
 # /////////////////////////////////////
 
+ERROR_CACHE = defaultdict(lambda: {
+    "count": 0,
+    "last_logged": 0
+})
+
+ERROR_WINDOW = 60      # seconds
+MAX_LOG_PER_WINDOW = 3
+
+#===========================================
+
+PY_ERROR_CACHE = defaultdict(lambda: {
+    "count": 0,
+    "last_logged": 0
+})
+
+PY_ERROR_WINDOW = 60        # seconds
+PY_MAX_LOG = 2              # per error per window
 
 
 
@@ -84,7 +101,13 @@ formatter = logging.Formatter(
 
 handler.setFormatter(formatter)
 
-logger = logging.getLogger()
+
+# ///
+# logger = logging.getLogger()
+logger = logging.getLogger("app")
+logger.propagate = False
+# //////
+
 logger.setLevel(logging.ERROR)
 logger.addHandler(handler)
 
@@ -94,6 +117,11 @@ console.setFormatter(formatter)
 logger.addHandler(console)
 
 # =================================================
+
+
+def get_error_key(e):
+    return f"{type(e).__name__}:{str(e)}"
+
 
 
 
@@ -2537,16 +2565,53 @@ def boom():
     return 1 / 0
 
 
+# @app.errorhandler(Exception)
+# def handle_exception(e):
+#     err_id = uuid.uuid4().hex[:8]
+#     logger.exception(f"[ERR-{err_id}] Unhandled exception")
+
+#     return jsonify({
+#         "success": False,
+#         "error_id": err_id,
+#         "message": "Internal server error"
+#     }), 500
+
+
+
+
 @app.errorhandler(Exception)
 def handle_exception(e):
     err_id = uuid.uuid4().hex[:8]
-    logger.exception(f"[ERR-{err_id}] Unhandled exception")
+
+    key = get_error_key(e)
+    now = time.time()
+    entry = PY_ERROR_CACHE[key]
+
+    # 🔁 reset window
+    if now - entry["last_logged"] > PY_ERROR_WINDOW:
+        entry["count"] = 0
+        entry["last_logged"] = now
+
+    # 🔐 log only limited times
+    if entry["count"] < PY_MAX_LOG:
+        logger.exception(
+            f"[ERR-{err_id}] {type(e).__name__}: {sanitize(e)}"
+        )
+        entry["count"] += 1
+    else:
+        entry["count"] += 1
+        # optional summary
+        if entry["count"] == PY_MAX_LOG + 1:
+            logger.warning(
+                f"⚠ Repeated server error suppressed: {type(e).__name__}"
+            )
 
     return jsonify({
         "success": False,
         "error_id": err_id,
         "message": "Internal server error"
     }), 500
+
 
 
 
@@ -2769,11 +2834,48 @@ a {{ color:#58a6ff; }}
 
 
 
+# @app.route("/client-error", methods=["POST"])
+# def client_error():
+#     data = request.get_json() or {}
+
+#     # 🔐 production mode check
+#     if not app.debug:
+#         data = {
+#             k: sanitize(v)
+#             for k, v in data.items()
+#             if k in {
+#                 "type",
+#                 "message",
+#                 "source",
+#                 "line",
+#                 "column",
+#                 "url",
+#                 "reason"
+#             }
+#         }
+
+#     logger.error(
+#         "🌐 CLIENT ERROR\n" +
+#         "\n".join(f"{k}: {v}" for k, v in data.items())
+#     )
+
+#     return jsonify({"ok": True})
+
+
+
+
+
 @app.route("/client-error", methods=["POST"])
 def client_error():
     data = request.get_json() or {}
 
-    # 🔐 production mode check
+    # error identity (same error detect করার জন্য)
+    key = f"{data.get('type')}|{data.get('message')}|{data.get('source')}"
+
+    now = time.time()
+    entry = ERROR_CACHE[key]
+
+    # 🔐 production sanitize
     if not app.debug:
         data = {
             k: sanitize(v)
@@ -2784,17 +2886,26 @@ def client_error():
                 "source",
                 "line",
                 "column",
-                "url",
-                "reason"
+                "url"
             }
         }
 
-    logger.error(
-        "🌐 CLIENT ERROR\n" +
-        "\n".join(f"{k}: {v}" for k, v in data.items())
-    )
+    # 🧠 rate limit logic
+    if now - entry["last_logged"] > ERROR_WINDOW:
+        entry["count"] = 0
+        entry["last_logged"] = now
 
-    return jsonify({"ok": True})
+    if entry["count"] < MAX_LOG_PER_WINDOW:
+        logger.error(
+            "🌐 CLIENT ERROR\n" +
+            "\n".join(f"{k}: {v}" for k, v in data.items())
+        )
+        entry["count"] += 1
+    else:
+        # silently ignore or only count
+        entry["count"] += 1
+
+    return {"ok": True}
 
 
 
