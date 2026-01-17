@@ -929,7 +929,8 @@ def execute_signal(user_id, item):
                 "signal": "BUY",
                 "status": status,
                 "data": data,
-                "leg": leg
+                "leg": leg,
+                "success": status == 200
             }
 
         if broker == "Delta":
@@ -1207,17 +1208,23 @@ def strategy_runner(user_id):
                     broker = res.get("brocker")
                     signal = res.get("signal")
                     data = res.get("data")
+                    status = res.get("status")
 
 
 
                     # updated_at = data.get("updated_at")
                     # print("updated_at :",updated_at)
 
-                    print("data :",data)
+                    print("status :",status)
 
                     if signal == "BUY":
 
-                        if data.get("success"):
+                        print("BUY RAW DATA:", data)
+
+
+                        if data.get("success") or res.get("success"):
+                        # if res.get("success") is True:
+
                             order = data.get("order", {})
                             updated_at = order.get("updated_at")
                             print("updated_at :",updated_at)
@@ -1234,11 +1241,11 @@ def strategy_runner(user_id):
                             })
                         last_signal = "BUY"
 
-                        db.reference(f"strategies/{user_id}").update({
-                            "pnl": pnl,
-                            "last_signal": last_signal,
-                            "positions": positions
-                        })
+                        # db.reference(f"strategies/{user_id}").update({
+                        #     "pnl": pnl,
+                        #     "last_signal": last_signal,
+                        #     "positions": positions
+                        # })
 
                     elif signal == "EXIT":
 
@@ -1256,6 +1263,7 @@ def strategy_runner(user_id):
                         })
                         last_signal = "EXIT"
 
+                print("last signal : ",last_signal)
                 db.reference(f"strategies/{user_id}").update({
                     "pnl": pnl,
                     "last_signal": last_signal,

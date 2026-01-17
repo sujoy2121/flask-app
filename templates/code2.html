@@ -4746,10 +4746,11 @@
 
                 const markPrice =
                     broker === "Dcx"
-                        ? toNum(binance_funding?.[sym]?.mark_price)
+                        ? toNum(binance_funding?.mark_price)
                         : toNum(ticker.mark_price);
 
                 // console.log("markPrice :", markPrice)
+                // console.log("data :", binance_funding);
 
                 // ---------------- AMOUNT ----------------
                 const amount = (qty * contractValue * markPrice) / leverage;
@@ -4871,7 +4872,7 @@
                 if (contactField?.value || hh) {
                     const nextFunding =
                         broker === "Dcx"
-                            ? binance_funding?.[sym]?.next_funding_time
+                            ? binance_funding?.next_funding_time
                             : info.next_funding_in;
 
                     const funding_rate =
