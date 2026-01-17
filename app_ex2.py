@@ -936,6 +936,7 @@ def execute_signal(user_id, item):
             return {
                 "brocker": "Dcx",
                 "signal": "BUY",
+                "data": data,
                 "status": status,
                 "success": bool(data and data.get("id") and data.get("status") != "error"),
                 "order": data if data and data.get("id") else None,
