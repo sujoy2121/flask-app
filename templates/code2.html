@@ -1989,7 +1989,7 @@
         let funding_data = JSON.parse(localStorage.getItem("fundingData") || "{}");
         let funding_data_dcx = JSON.parse(localStorage.getItem("fundingDataDcx") || "{}");
 
-        let selected = JSON.parse(localStorage.getItem("selectedSymbols") || "[]");
+        let selected = JSON.parse(localStorage.getItem("selectedSymbols") || "{}");
 
         let binance_funding = {}
 
@@ -2014,6 +2014,7 @@
         }
 
         function setSelected(obj) {
+            // console.log("✅ selectedSymbols:", obj);
             localStorage.setItem("selectedSymbols", JSON.stringify(obj));
         }
 
@@ -4148,7 +4149,10 @@
         async function binance_funding_update() {
             try {
 
+                let selected = getSelected();
+
                 // console.log("selected =", selected, typeof selected);
+                // console.log("selected data : ", getSelected())
 
                 // ✅ object → array
                 const symbolsArray = selected && typeof selected === "object"
@@ -4175,7 +4179,7 @@
 
                 binance_funding = data;
 
-                // console.log("data :", data)
+                // console.log("data u:", data)
 
             } catch (err) {
                 console.error("Error fetching futures:", err);
@@ -4750,7 +4754,7 @@
                         : toNum(ticker.mark_price);
 
                 // console.log("markPrice :", markPrice)
-                console.log("data :", binance_funding);
+                // console.log("data :", binance_funding);
 
                 // ---------------- AMOUNT ----------------
                 const amount = (qty * contractValue * markPrice) / leverage;
@@ -5143,7 +5147,7 @@
                 if (!res.ok) throw new Error("Unauthorized or fetch error");
                 const data = await res.json();
 
-                console.log("data :", data)
+                // console.log("data :", data)
 
                 // 🔍 Find USD & INR
                 const usd = data.find(a => a.asset_symbol === "USD");
