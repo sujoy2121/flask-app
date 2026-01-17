@@ -924,14 +924,26 @@ def execute_signal(user_id, item):
                 time_in_force="good_till_cancel"
             )
 
+            # return {
+            #     "brocker": "Dcx",
+            #     "signal": "BUY",
+            #     "status": status,
+            #     "data": data,
+            #     "leg": leg,
+            #     "success": status == 200
+            # }
+        
             return {
                 "brocker": "Dcx",
                 "signal": "BUY",
                 "status": status,
-                "data": data,
-                "leg": leg,
-                "success": status == 200
+                "success": bool(data and data.get("id") and data.get("status") != "error"),
+                "order": data if data and data.get("id") else None,
+                "error": data if data and data.get("status") == "error" else None,
+                "leg": leg
             }
+
+
 
         if broker == "Delta":
             
