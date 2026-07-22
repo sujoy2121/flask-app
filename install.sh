@@ -8,6 +8,8 @@ pkg update -y
 echo "Upgrading packages..."
 pkg upgrade -y
 
+pkg install proot-distro -y
+
 echo "Installing packages..."
 pkg install openssh tmux git curl wget nano vim python -y
 
